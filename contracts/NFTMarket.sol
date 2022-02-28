@@ -1,9 +1,12 @@
-// SPDX-License-Identifier: MIT
+// contracts/Market.sol
+// SPDX-License-Identifier: MIT OR Apache-2.0
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+import "hardhat/console.sol";
 
 contract NFTMarket is ReentrancyGuard {
     using Counters for Counters.Counter;
@@ -39,10 +42,12 @@ contract NFTMarket is ReentrancyGuard {
         bool sold
     );
 
+    /* Returns the listing price of the contract */
     function getListingPrice() public view returns (uint256) {
         return listingPrice;
     }
 
+    /* Places an item for sale on the marketplace */
     function createMarketItem(
         address nftContract,
         uint256 tokenId,
@@ -80,6 +85,8 @@ contract NFTMarket is ReentrancyGuard {
         );
     }
 
+    /* Creates the sale of a marketplace item */
+    /* Transfers ownership of the item, as well as funds between parties */
     function createMarketSale(address nftContract, uint256 itemId)
         public
         payable
@@ -89,7 +96,7 @@ contract NFTMarket is ReentrancyGuard {
         uint256 tokenId = idToMarketItem[itemId].tokenId;
         require(
             msg.value == price,
-            "please submit the asking price in order to complete the purchase"
+            "Please submit the asking price in order to complete the purchase"
         );
 
         idToMarketItem[itemId].seller.transfer(msg.value);
@@ -100,6 +107,7 @@ contract NFTMarket is ReentrancyGuard {
         payable(owner).transfer(listingPrice);
     }
 
+    /* Returns all unsold market items */
     function fetchMarketItems() public view returns (MarketItem[] memory) {
         uint256 itemCount = _itemIds.current();
         uint256 unsoldItemCount = _itemIds.current() - _itemsSold.current();
@@ -113,10 +121,10 @@ contract NFTMarket is ReentrancyGuard {
                 currentIndex++;
             }
         }
-
         return items;
     }
 
+    /* Returns only items that a user has purchased */
     function fetchMyNFTs() public view returns (MarketItem[] memory) {
         uint256 totalItemCount = _itemIds.current();
         uint256 itemCount = 0;
@@ -136,10 +144,10 @@ contract NFTMarket is ReentrancyGuard {
                 currentIndex++;
             }
         }
-
         return items;
     }
 
+    /* Returns only items a user has created */
     function fetchItemsCreated() public view returns (MarketItem[] memory) {
         uint256 totalItemCount = _itemIds.current();
         uint256 itemCount = 0;
