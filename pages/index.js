@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { useEffect, useState, Image } from 'react';
+import { useEffect, Image, useState } from 'react';
 import axios from 'axios';
 import Web3Modal from 'web3modal';
 
@@ -23,9 +23,9 @@ export default function Home() {
     const data = await marketContract.fetchMarketItems();
 
     const items = await Promise.all(data.map(async i => {
-      const tokenUri = await tokenContract.tokenUri(i.tokenid);
-      const meta = await axios.get(tokenUri);
-      let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
+      const tokenUri = await tokenContract.tokenURI(i.tokenId)
+      const meta = await axios.get(tokenUri)
+      let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
       let item = {
         price,
         tokenId: i.tokenId.toNumber(),
@@ -35,12 +35,10 @@ export default function Home() {
         name: meta.data.name,
         description: meta.data.description,
       }
-
-      return item;
-    }));
-
-    setNfts(items);
-    setLoadingState('loaded');
+      return item
+    }))
+    setNfts(items)
+    setLoadingState('loaded')
   }
 
   async function buyNft(nft) {
@@ -71,7 +69,7 @@ export default function Home() {
           {
             nfts.map((nft, i) => (
               <div key={i} className="border shadow rounded-xl overflow-hidden">
-                <Image src={nft.image} alt={"nft"} />
+                <img src={nft.image} alt="nft" />
                 <div className="p-4">
                   <p style={{ height: '64px' }} className="text-2xl font-semibold">{nft.name}</p>
                   <div>
@@ -79,7 +77,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="p-4 bg-black">
-                  <p className="p-4 bg-black">{nft.price}</p>
+                  <p className="p-4 bg-black text-white">{nft.price} Matic</p>
                   <button className='w-full bg-pink-500 text-white font-bold py-2 px-12 rounded'
                     onClick={() => buyNft(nft)}>Buy</button>
                 </div>
